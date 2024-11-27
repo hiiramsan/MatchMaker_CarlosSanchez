@@ -1,44 +1,24 @@
 const NACIONALIDADES_ACEPTADAS = [
   { key: "AU", name: "Australia" },
-
   { key: "BR", name: "Brasil" },
-
   { key: "CA", name: "Canada" },
-
   { key: "CH", name: "Suiza" },
-
   { key: "DE", name: "Alemania" },
-
   { key: "DK", name: "Dinamarca" },
-
   { key: "ES", name: "España" },
-
   { key: "FI", name: "Finlandia" },
-
   { key: "FR", name: "Francia" },
-
   { key: "GB", name: "Reino Unido" },
-
   { key: "IE", name: "Irlanda" },
-
   { key: "IN", name: "India" },
-
   { key: "IR", name: "Irán" },
-
   { key: "MX", name: "México" },
-
   { key: "NL", name: "Países Bajos" },
-
   { key: "NO", name: "Noruega" },
-
   { key: "NZ", name: "Nueva Zelanda" },
-
   { key: "RS", name: "Serbia" },
-
   { key: "TR", name: "Turquía" },
-
   { key: "UA", name: "Ucrania" },
-
   { key: "US", name: "Brasil" },
 ];
 
@@ -58,6 +38,8 @@ window.onload = function () {
   }
 
   llenarNacionalidad();
+  //form[0].onsubmit = enviar;
+  form[0].onsubmit = enviar2;
 };
 
 function llenarNacionalidad() {
@@ -84,4 +66,56 @@ function noResaltar(evento) {
 
 function resaltarDesresaltar(evento) {
   evento.target.classList.toggle("selected");
+}
+
+function obtenerGenero(){
+  const genero = document.getElementsByName("interest");
+  const gactivos = [];
+  for(let g of genero){
+    if(g.checked){
+      gactivos.push(g.value);
+    }
+  }
+
+  if(gactivos.length === 0){
+    gactivos.push("male");
+    gactivos.push("female");
+  }
+
+  const index = gactivos.length > 1 ? Math.floor(Math.random() * 2) : 0
+  return gactivos[index];
+
+}
+
+function enviar(evento){
+  evento.preventDefault();
+  const nacionalidad = document.getElementById("nationality");
+  const genero = obtenerGenero();
+  window.location.href = `its-a-match.html?nac=${nacionalidad.value}&genero=${genero}`;
+}
+
+function enviar2(evento) {
+  evento.preventDefault();
+  const nacionalidad = document.getElementById("nationality");
+  const genero = obtenerGenero();
+
+  const request = new Request(
+    `https://randomuser.me/api/?nat=${nacionalidad}&gender=${genero}`,
+    {
+      method: "get",
+      headers: new Headers({
+        "Content-Type": "application/json",
+      })
+    }
+  );
+
+fetch(request)
+  .then(function(response) {
+    return response.json();    
+  }).then(function(data){
+    localStorage.setItem("match", JSON.stringify(data.results[0]));
+    window.location.href = "its-a-match.html";
+  }).catch(function(error){
+    console.log(error);
+  });
 }
